@@ -1,11 +1,12 @@
-import mongoose from "mongoose";
 import app from "./config/app";
 import { config } from "./config";
+import { sequelize } from "./config/db";
 
-mongoose.connect(config.db_url, {})
-    .then(() => console.log("mongodb is running."))
-    .catch(e => console.error(e));
+sequelize.sync()
+  .then(() => {
+    app.listen(config.server_port, () => {
+        console.log(`listening on port ${config.server_port}`);
+    })
+  })
+  .catch((error) => console.log('Sequelize synchronization error: ', error));
 
-app.listen(config.server_port, () => {
-    console.log(`listening on port ${config.server_port}`);
-})

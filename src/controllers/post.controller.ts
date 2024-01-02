@@ -1,26 +1,26 @@
 import { Request, Response } from "express";
-import { Post, PostDocument } from "../schemas/post.schema";
-import { User, UserDocument } from "../schemas/user.schema";
+import { Post } from "../models/post.model";
+import { User } from "../models/user.model";
 
 export default class PostController {
   async create(req: Request, res: Response): Promise<Response> {
     const { title, body, authorId } = req.body;
-    const author: UserDocument | null = await User.findById(authorId);
+    const author: User | null = await User.findByPk(authorId);
     if (!author) {
       return res.status(404).json({ message: "author not found" });
     }
-    const newPost = await new Post({
+    const post = await Post.create({
       title: title,
       body: body,
-      author: author._id,
-    }).save();
+      authorId: author.id,
+    });
 
-    return res.status(201).json({ message: "post created", post: newPost });
+    return res.status(201).json({ message: "post created", post: post });
   }
 
   async findOne(req: Request, res: Response): Promise<Response> {
     const { postId } = req.params;
-    const post: PostDocument | null = await Post.findById(postId);
+    const post: Post | null = await Post.findByPk(postId);
     if (!post) {
       return res.status(404).json({ message: "post not found" });
     }
@@ -30,9 +30,9 @@ export default class PostController {
 
   async findAll(req: Request, res: Response): Promise<Response> {
     const { authorId } = req.params;
-    const posts: PostDocument[] = authorId
-      ? await Post.find({ author: authorId })
-      : await Post.find();
+    const posts: Post[] = authorId
+      ? await Post.findAll({ where: { authorId: authorId } })
+      : await Post.findAll();
 
     return res.status(200).json({ message: "posts fetched", posts: posts });
   }
@@ -40,26 +40,26 @@ export default class PostController {
   async update(req: Request, res: Response): Promise<Response> {
     const { postId, authorId } = req.params;
     const { title, body } = req.body;
-    const post: PostDocument | null = await Post.findOneAndUpdate(
-      {
-        id: postId,
-        author: authorId,
-      },
-      { title: title, body: body }
-    );
+    const post: Post | null = await Post.findOne({
+      where: { id: postId, authorId: authorId },
+    });
     if (!post) {
       return res.status(404).json({ message: "post not found" });
     }
+    const updatedPost = await post.update({ title: title, body: body });
 
-    return res.status(200).json({ message: "post updated", post: post });
+    return res.status(200).json({ message: "post updated", post: updatedPost });
   }
 
   async delete(req: Request, res: Response): Promise<Response> {
-    const { postId } = req.params;
-    const post = await Post.findByIdAndDelete(postId);
+    const { postId, authorId } = req.params;
+    const post: Post | null = await Post.findOne({
+      where: { id: postId, authorId: authorId },
+    });
     if (!post) {
       return res.status(404).json({ message: "post not found" });
     }
+    await post.destroy();
 
     return res.status(200).json({ message: "post deleted" });
   }
