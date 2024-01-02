@@ -1,7 +1,10 @@
+import dotenv from "dotenv";
+
+dotenv.config()
 export const config = {
     server_port: 3000,
     // Database
-    db_user: process.env.DB_USER || "postgress",
+    db_user: process.env.DB_USER || "postgres",
     db_host: process.env.DB_HOST || "localhost",
     db_name: process.env.DB_NAME || "dockerised-crud-api",
     db_password: process.env.DB_PASSWORD || "postgres",

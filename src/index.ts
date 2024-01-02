@@ -1,12 +1,17 @@
 import app from "./config/app";
 import { config } from "./config";
-import { sequelize } from "./config/db";
+import { dbSetup } from "./config/db";
+import { Sequelize } from "sequelize";
 
-sequelize.sync()
-  .then(() => {
+export let sequelize: Sequelize;
+dbSetup()
+  .then((value) => {
+    sequelize = value;
+
     app.listen(config.server_port, () => {
-        console.log(`listening on port ${config.server_port}`);
-    })
+      console.log(`listening to port ${config.server_port}...`);
+    });
   })
-  .catch((error) => console.log('Sequelize synchronization error: ', error));
-
+  .catch((err) => {
+    console.error("Unable to connect to the Postgres database:", err);
+  });

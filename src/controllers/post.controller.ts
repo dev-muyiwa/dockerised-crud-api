@@ -15,7 +15,7 @@ export default class PostController {
       authorId: author.id,
     });
 
-    return res.status(201).json({ message: "post created", post: post });
+    return res.status(201).json({ message: "post created", data: post.dataValues });
   }
 
   async findOne(req: Request, res: Response): Promise<Response> {
@@ -25,7 +25,7 @@ export default class PostController {
       return res.status(404).json({ message: "post not found" });
     }
 
-    return res.status(200).json({ message: "post fetched", post: post });
+    return res.status(200).json({ message: "post fetched", data: post.dataValues });
   }
 
   async findAll(req: Request, res: Response): Promise<Response> {
@@ -34,7 +34,7 @@ export default class PostController {
       ? await Post.findAll({ where: { authorId: authorId } })
       : await Post.findAll();
 
-    return res.status(200).json({ message: "posts fetched", posts: posts });
+    return res.status(200).json({ message: "posts fetched", data: posts });
   }
 
   async update(req: Request, res: Response): Promise<Response> {
@@ -48,7 +48,7 @@ export default class PostController {
     }
     const updatedPost = await post.update({ title: title, body: body });
 
-    return res.status(200).json({ message: "post updated", post: updatedPost });
+    return res.status(200).json({ message: "post updated", data: updatedPost.dataValues });
   }
 
   async delete(req: Request, res: Response): Promise<Response> {

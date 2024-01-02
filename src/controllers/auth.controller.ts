@@ -13,14 +13,16 @@ export default class AuthController {
         .json({ message: "an account exists with that email address" });
     }
 
-    const { password, ...user } = await User.create({
+    const user = await User.create({
       firstName: firstName,
       lastName: lastName,
       email: email.trim(),
       password: passwordInput,
     });
 
-    return res.status(201).json({ message: "account created", user: user });
+    const {password, ...data} = user.dataValues
+
+    return res.status(201).json({ message: "account created", data: data });
   }
 
   async login(req: Request, res: Response): Promise<Response> {
@@ -31,7 +33,7 @@ export default class AuthController {
     if (!existingUser || existingUser.password !== passwordInput) {
       return res.status(404).json({ message: "invalid login credentials" });
     }
-    const { password, ...user } = existingUser;
-    return res.status(201).json({ message: "login successful", user: user });
+    const { password, ...user } = existingUser.dataValues;
+    return res.status(201).json({ message: "login successful", data: user });
   }
 }

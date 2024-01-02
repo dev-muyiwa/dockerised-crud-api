@@ -1,47 +1,55 @@
-import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../config/db";
-import { Post } from "./post.model";
+import {
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+} from "sequelize-typescript";
 import { ulid } from "ulid";
+import { Post } from "./post.model";
 
+@Table
 class User extends Model {
-  public id!: number;
-  public firstName!: string;
-  public lastName!: string;
-  public email!: string;
-  public password!: number;
-}
+  @PrimaryKey
+  @Column({
+    type: DataType.STRING,
+    defaultValue: () => ulid(),
+  })
+  id!: string;
 
-User.init(
-  {
-    id: {
-      type: DataTypes.STRING,
-      defaultValue: () => ulid(),
-      primaryKey: true,
-    },
-    firstName: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    lastName: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: "User",
-    tableName: "users",
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: false,
+  })
+  firstName!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: false,
+  })
+  lastName!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
+  email!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  password!: string;
+
+  @HasMany(() => Post, "authorId")
+  posts!: Post[];
+
+  getBasicInfo(): object {
+    const { id, firstName, lastName, email } = this;
+    return { id, firstName, lastName, email };
   }
-);
-
-User.hasMany(Post, { foreignKey: "authorId", as: "posts" });
+}
 
 export { User };
