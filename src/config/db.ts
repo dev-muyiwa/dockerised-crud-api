@@ -4,7 +4,7 @@ import { Post } from "../models/post.model";
 import { config } from ".";
 
 export const dbSetup = async () => {
-  const sequelize: Sequelize = new Sequelize({
+    const sequelize: Sequelize = new Sequelize( {
     dialect: "postgres",
     host: config.db_host,
     port: config.db_port,
