@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    container_name: postgres-db
+    image: postgres:15.5
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - api-network
+
+  server:
+    container_name: server
+    restart: on-failure
+    build: 
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT}:3000
+    volumes:
+      - node_modules:/dockerised-crud-api/node_modules
+      - server_data:/dockerised-crud-api
+    env_file:
+      - .env
+    networks:
+      - api-network
+
+volumes:
+  postgres_data: {}
+  node_modules: {}
+  server_data: {}
+
+networks:
+  api-network:

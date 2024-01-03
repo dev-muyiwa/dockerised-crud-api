@@ -2,6 +2,9 @@ import app from "./config/app";
 import { config } from "./config";
 import { dbSetup } from "./config/db";
 import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
+
+dotenv.config()
 
 export let sequelize: Sequelize;
 dbSetup()
